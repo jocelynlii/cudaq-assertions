@@ -19,10 +19,15 @@ class StatKernel(cudaq.PyKernel):
         Performs a chi-squared statistical test on the observed measurement distribution, which
         is obtained by calling cudaq.sample. Internally, it builds an expected distribution that 
         is a table of all 1's exccept for the expected value, which is 2^16. Then, it normalizes 
-        the expected and observedn distributions, and compares them through the chi-square test.
+        the expected and observed distributions, and compares them through the chi-square test.
 
         Args:
-            pcrit:
+            pcrit(float): critical p-value
+            expval(int or string or None): the expected value
+                If no expected value specified, then this assertion just checks
+                that the measurement outcomes are in any classical state.
+            negate(bool): True if assertion passed is negation of statistical test passed
+            params: params that the kernel needs to take in
 
         Returns:
             tuple: tuple containing:
@@ -70,5 +75,46 @@ class StatKernel(cudaq.PyKernel):
             passed = not passed
         else:
             passed = passed
+
+        return (chisq, pval, passed)
+    
+
+    def uniform_assertion(self, pcrit, negate=False, params=[]):
+        """
+        Performs a chi-squared statistical test on the observed measurement 
+        distribution, which is obtained by calling cudaq.sample. Internally, compares
+        a normalized table of experimental counts to the scipy.stats.chisquare default, for which
+        all outcomes are equally likely.
+
+        Args:
+            pcrit(float): critical p-value
+            negate(bool): True if assertion passed is negation of statistical test passed
+            params: params that the kernel needs to take in
+
+        Returns:
+            tuple: tuple containing:
+
+                chisq(float): the chi-square value
+
+                pval(float): the p-value
+
+                passed(Boolean): if the test passed
+        """
+        counts = cudaq.sample(self, *params)
+
+        dict_result = dict(counts.items())
+
+        vals_list = list(dict_result.values()) 
+        numqubits = len(str(list(dict_result)[0])) 
+
+        numzeros = 2 ** numqubits - len(dict_result) 
+
+        vals_list.extend([0] * numzeros) 
+
+        chisq, pval = chisquare(vals_list)
+        if negate:
+            passed = not bool(pval >= pcrit)
+        else:
+            passed = bool(pval >= pcrit)
 
         return (chisq, pval, passed)

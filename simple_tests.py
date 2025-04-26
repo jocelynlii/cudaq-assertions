@@ -1,6 +1,20 @@
 from stat_kernel import StatKernel
 from stat_kernel import make_kernel
+from typing import List
 import cudaq
+
+#############################################################################
+# Cost Minimization
+#############################################################################
+# Initial gate parameters which intialize the qubit in the zero state
+initial_parameters = [0, 0]
+
+kernel, angles = make_kernel(List[float])
+qubit = kernel.qalloc(1)
+kernel.rx(angles[0], qubit)
+kernel.ry(angles[1], qubit)
+print(kernel.classical_assertion(0.05, params=[initial_parameters]))
+print(kernel.uniform_assertion(0.05, params=[initial_parameters]))
 
 #############################################################################
 # basic test - product state, but not uniform nor classical

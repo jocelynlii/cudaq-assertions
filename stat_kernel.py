@@ -14,7 +14,7 @@ class StatKernel(cudaq.PyKernel):
         """
         super().__init__([*args])
 
-    def classical_assertion(self, pcrit, expval=None, negate=False, params=[]):
+    def classical_assertion(self, pcrit=None, expval=None, negate=False, params=[]):
         """
         Performs a chi-squared statistical test on the observed measurement distribution, which
         is obtained by calling cudaq.sample. Internally, it builds an expected distribution that 
@@ -38,6 +38,9 @@ class StatKernel(cudaq.PyKernel):
 
                 passed(bool): if the test passed
         """
+        if pcrit is None:
+            pcrit = 0.05
+        
         counts = cudaq.sample(self, *params)
 
         dict_result = dict(counts.items())
@@ -79,7 +82,7 @@ class StatKernel(cudaq.PyKernel):
         return (chisq, pval, passed)
     
 
-    def uniform_assertion(self, pcrit, negate=False, params=[]):
+    def uniform_assertion(self, pcrit=None, negate=False, params=[]):
         """
         Performs a chi-squared statistical test on the observed measurement 
         distribution, which is obtained by calling cudaq.sample. Internally, compares
@@ -100,6 +103,9 @@ class StatKernel(cudaq.PyKernel):
 
                 passed(Boolean): if the test passed
         """
+        if pcrit is None:
+            pcrit = 0.05
+
         counts = cudaq.sample(self, *params)
 
         dict_result = dict(counts.items())
@@ -119,7 +125,7 @@ class StatKernel(cudaq.PyKernel):
 
         return (chisq, pval, passed)
     
-    def product_assertion(self, pcrit, q0len, q1len, negate=False, params=[]):
+    def product_assertion(self, q0len, q1len, pcrit=None, negate=False, params=[]):
         """
         Performs a chi-squared contingency test on the observed measurement 
         distribution, which is obtained by calling cudaq.sample.
@@ -142,6 +148,9 @@ class StatKernel(cudaq.PyKernel):
 
                 passed(bool): if the test passed
         """
+        if pcrit is None:
+            pcrit = 0.05
+
         counts = cudaq.sample(self, *params)
         dict_result = dict(counts.items())
 

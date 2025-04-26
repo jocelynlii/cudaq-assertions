@@ -17,7 +17,7 @@ if b0:
 print(cudaq.sample(k1))
 print(k1.classical_assertion(0.05))
 print(k1.uniform_assertion(0.05))
-print(k1.product_assertion(0.05, 1, 1))
+print(k1.product_assertion(1, 1, 0.05))
 
 ############################################################################
 # uniform and product, not classical 
@@ -39,7 +39,7 @@ k1.s(q[2])
 print(cudaq.sample(k1))
 print(k1.classical_assertion(0.05))
 print(k1.uniform_assertion(0.05))
-print(k1.product_assertion(0.05, 2, 2))
+print(k1.product_assertion(2, 2, 0.05))
 
 #############################################################################
 # basic test - uniform and product state
@@ -52,7 +52,7 @@ for i in range(0,2):
 print(cudaq.sample(k1))
 print(k1.classical_assertion(0.05))
 print(k1.uniform_assertion(0.05))
-print(k1.product_assertion(0.05, 1, 1))
+print(k1.product_assertion(1, 1, 0.05))
 
 #############################################################################
 # basic test - entanglement (not product), and not uniform nor classical
@@ -67,7 +67,7 @@ k1.mz(qubits)
 print(cudaq.sample(k1))
 print(k1.classical_assertion(0.05))
 print(k1.uniform_assertion(0.05))
-print(k1.product_assertion(0.05, 1, 1))
+print(k1.product_assertion(1, 1, 0.05))
 
 ################################################################
 # basic test - classical state (x gate only)
@@ -78,4 +78,4 @@ kernel.x(qubits)
 print(cudaq.sample(kernel))
 print(kernel.classical_assertion(0.05))
 print(kernel.uniform_assertion(0.05))
-print(kernel.product_assertion(0.05, 2,1))
+print(kernel.product_assertion(2,1, 0.05))

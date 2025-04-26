@@ -26,7 +26,7 @@ for i in range(qubit_count):
 print(cudaq.sample(quantum_fourier_transform, init_input_state))
 print(quantum_fourier_transform.classical_assertion(0.05, params=[init_input_state]))
 print(quantum_fourier_transform.uniform_assertion(0.05, params=[init_input_state]))
-print(quantum_fourier_transform.product_assertion(0.05, 2, 1, params=[init_input_state]))
+print(quantum_fourier_transform.product_assertion(2, 1, 0.05, params=[init_input_state]))
 
 # Apply Hadamard gates and controlled rotation gates.
 for i in range(qubit_count):
@@ -39,7 +39,7 @@ for i in range(qubit_count):
 print(cudaq.sample(quantum_fourier_transform, init_input_state))
 print(quantum_fourier_transform.classical_assertion(0.05, params=[init_input_state])) 
 print(quantum_fourier_transform.uniform_assertion(0.05, params=[init_input_state]))
-print(quantum_fourier_transform.product_assertion(0.05, 2, 1, params=[init_input_state]))
+print(quantum_fourier_transform.product_assertion(2, 1, 0.05, params=[init_input_state]))
 
 # Draw the quantum circuit
 print(cudaq.draw(quantum_fourier_transform, init_input_state))

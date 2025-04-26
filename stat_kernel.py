@@ -27,7 +27,7 @@ class StatKernel(cudaq.PyKernel):
                 If no expected value specified, then this assertion just checks
                 that the measurement outcomes are in any classical state.
             negate(bool): True if assertion passed is negation of statistical test passed
-            params: params that the kernel needs to take in
+            params: params that the kernel needs to take in to run
 
         Returns:
             tuple: tuple containing:
@@ -89,7 +89,7 @@ class StatKernel(cudaq.PyKernel):
         Args:
             pcrit(float): critical p-value
             negate(bool): True if assertion passed is negation of statistical test passed
-            params: params that the kernel needs to take in
+            params: params that the kernel needs to take in to run
 
         Returns:
             tuple: tuple containing:
@@ -118,3 +118,51 @@ class StatKernel(cudaq.PyKernel):
             passed = bool(pval >= pcrit)
 
         return (chisq, pval, passed)
+    
+    def product_assertion(self, pcrit, q0len, q1len, negate=False, params=[]):
+        """
+        Performs a chi-squared contingency test on the observed measurement 
+        distribution, which is obtained by calling cudaq.sample.
+        Internally, constructs a contingency table from the observed measurement
+        distribution counts, then feeds it into scipy.stats.fisher_exact.
+
+        Args:
+            pcrit(float): critical p-value
+            q0len(int): length (number of qubits) of qubit group 0
+            q1len(int): length (number of qubits) of qubit group 1
+            negate(bool): True if assertion passed is negation of statistical test passed
+            params: params that the kernel needs to take in to run
+
+        Returns:
+            tuple: tuple containing:
+
+                odds_ratio(float): the odds ratio, returned from scipy.stats.fisher_exact
+
+                pval(float): the p-value
+
+                passed(bool): if the test passed
+        """
+        counts = cudaq.sample(self, *params)
+        dict_result = dict(counts.items())
+
+        if (len(list(dict_result.keys())[0]) == 1):
+            raise Exception("Only 1 qubit -- product state assertion requires at least 2 qubits")
+
+        if (q0len + q1len != len(list(dict_result.keys())[0])):
+            raise Exception("2 qubit lengths passed in do not add up to the expected total length")
+        
+        cont_table = np.zeros((2 ** q0len, 2 ** q1len))
+
+        for (key, value) in dict_result.items():
+            q0index = int(key[:q0len], 2) 
+            q1index = int(key[q0len:], 2)
+            cont_table[q0index][q1index] = value 
+
+        odds_ratio, pval = fisher_exact(cont_table) 
+
+        if negate:
+            passed = not bool(pval >= pcrit) 
+        else:
+            passed = bool(pval >= pcrit)
+
+        return (odds_ratio, pval, passed)

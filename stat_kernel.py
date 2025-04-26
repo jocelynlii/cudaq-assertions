@@ -177,10 +177,3 @@ def make_kernel(*args):
 
     return kernel, *kernel.arguments
 
-# kernel = StatKernel()
-# kernel1 = make_kernel()
-# kernel1.qalloc(3)
-# print(cudaq.sample(kernel1))
-# print(kernel1.classical_assertion(0.05))
-# print(kernel1.uniform_assertion(0.05))
-# print(kernel1.product_assertion(0.05, 1, 2))

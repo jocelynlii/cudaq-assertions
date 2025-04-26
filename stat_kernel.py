@@ -14,7 +14,7 @@ class StatKernel(cudaq.PyKernel):
         """
         super().__init__([*args])
 
-    def classical_assertion(self, pcrit=None, expval=None, negate=False, params=[]):
+    def classical_assertion(self, pcrit=None, shots_count=None, expval=None, negate=False, params=[]):
         """
         Performs a chi-squared statistical test on the observed measurement distribution, which
         is obtained by calling cudaq.sample. Internally, it builds an expected distribution that 
@@ -22,7 +22,8 @@ class StatKernel(cudaq.PyKernel):
         the expected and observed distributions, and compares them through the chi-square test.
 
         Args:
-            pcrit(float): critical p-value
+            pcrit(float): critical p-value. If None passed in, defaults to 0.05
+            shots_count(int): number of shots taken for measurement distribution. If None, defaults to 1000.
             expval(int or string or None): the expected value
                 If no expected value specified, then this assertion just checks
                 that the measurement outcomes are in any classical state.
@@ -41,7 +42,10 @@ class StatKernel(cudaq.PyKernel):
         if pcrit is None:
             pcrit = 0.05
         
-        counts = cudaq.sample(self, *params)
+        if shots_count is None:
+            counts = cudaq.sample(self, *params)
+        else:
+            counts = cudaq.sample(self, *params, shots_count=shots_count)
 
         dict_result = dict(counts.items())
 
@@ -82,7 +86,7 @@ class StatKernel(cudaq.PyKernel):
         return (chisq, pval, passed)
     
 
-    def uniform_assertion(self, pcrit=None, negate=False, params=[]):
+    def uniform_assertion(self, pcrit=None, shots_count=None, negate=False, params=[]):
         """
         Performs a chi-squared statistical test on the observed measurement 
         distribution, which is obtained by calling cudaq.sample. Internally, compares
@@ -90,7 +94,8 @@ class StatKernel(cudaq.PyKernel):
         all outcomes are equally likely.
 
         Args:
-            pcrit(float): critical p-value
+            pcrit(float): critical p-value. If None passed in, defaults to 0.05
+            shots_count(int): number of shots taken for measurement distribution. If None, defaults to 1000.
             negate(bool): True if assertion passed is negation of statistical test passed
             params: params that the kernel needs to take in to run
 
@@ -106,7 +111,10 @@ class StatKernel(cudaq.PyKernel):
         if pcrit is None:
             pcrit = 0.05
 
-        counts = cudaq.sample(self, *params)
+        if shots_count is None:
+            counts = cudaq.sample(self, *params)
+        else:
+            counts = cudaq.sample(self, *params, shots_count=shots_count)
 
         dict_result = dict(counts.items())
 
@@ -125,7 +133,7 @@ class StatKernel(cudaq.PyKernel):
 
         return (chisq, pval, passed)
     
-    def product_assertion(self, q0len, q1len, pcrit=None, negate=False, params=[]):
+    def product_assertion(self, q0len, q1len, pcrit=None, shots_count=None, negate=False, params=[]):
         """
         Performs a chi-squared contingency test on the observed measurement 
         distribution, which is obtained by calling cudaq.sample.
@@ -133,9 +141,10 @@ class StatKernel(cudaq.PyKernel):
         distribution counts, then feeds it into scipy.stats.fisher_exact.
 
         Args:
-            pcrit(float): critical p-value
             q0len(int): length (number of qubits) of qubit group 0
             q1len(int): length (number of qubits) of qubit group 1
+            pcrit(float): critical p-value. If None passed in, defaults to 0.05
+            shots_count(int): number of shots taken for measurement distribution. If None, defaults to 1000.
             negate(bool): True if assertion passed is negation of statistical test passed
             params: params that the kernel needs to take in to run
 
@@ -151,7 +160,11 @@ class StatKernel(cudaq.PyKernel):
         if pcrit is None:
             pcrit = 0.05
 
-        counts = cudaq.sample(self, *params)
+        if shots_count is None:
+            counts = cudaq.sample(self, *params)
+        else:
+            counts = cudaq.sample(self, *params, shots_count=shots_count)
+
         dict_result = dict(counts.items())
 
         if (len(list(dict_result.keys())[0]) == 1):

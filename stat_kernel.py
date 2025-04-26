@@ -166,3 +166,13 @@ class StatKernel(cudaq.PyKernel):
             passed = bool(pval >= pcrit)
 
         return (odds_ratio, pval, passed)
+
+def make_kernel(*args):
+    """
+        Function used to instantiate a StatKernel instance.
+    """
+    kernel = StatKernel(*args)
+    if len([*args]) == 0:
+        return kernel
+
+    return kernel, *kernel.arguments
